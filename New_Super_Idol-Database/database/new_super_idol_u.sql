@@ -231,3 +231,56 @@ CREATE TABLE purchase (
         Foreign Key (game_id) REFERENCES videogame(game_id)
         ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
+
+--------------------
+/* CREATING VIEWS */
+--------------------
+
+-- View 1: Total playtime per user per game
+CREATE VIEW v_user_total_playtime AS
+SELECT
+    u.user_id,
+    u.username,
+    v.game_id,
+    v.title AS game title,
+    COUNT(p.session_id) AS total_sessions,
+    COALESCE(SUM(p.duration_minutes), 0) AS total_minutes,
+    ROUND(COALESCE(SUM(p.duration_minutes), 0) / 60, 2) AS total_hours -- Convert minutes to hours
+FROM user u
+CROSS JOIN videogame v
+LEFT JOIN playtime p ON u.user_id = p.user_id AND v.game_id = p.game_id
+GROUP BY u.user_id, u.username, v.game_id, v.title;
+
+-- View 2: Achievement completion percentage per user per game
+CREATE VIEW v_user_achievement_progress AS
+SELECT
+    u.user_id,
+    u.username,
+    v.game_id,
+    v.title AS game_title,
+    COUNT(DISTINCT a.achievement_id) AS total_achievements,
+    COUNT(DISTINCT ua.achievement_id) AS unlocked_achievements,
+    ROUND(
+        (COUNT(DISTINCT ua.achievement_id) / NULLIF(COUNT(DISTINCT a.achievement_id), 0)) * 100, -- Avoid division by zero
+        2
+    ) AS completion_percentage
+FROM user u
+CROSS JOIN videogame v
+LEFT JOIN achievement a ON v.game_id = a.game_id
+LEFT JOIN user_achievement ua ON u.user_id = ua.user_id AND a.achievement_id = ua.achievement_id
+GROUP BY u.user_id, u.username, v.game_id, v.title;
+
+-- View 3: Total money spent per user
+CREATE VIEW v_user_total_spent AS
+SELECT
+    u.user_id,
+    u.username,
+    v.game_id,
+    v.title AS game_title,
+    COUNT(p.purchase_id) AS total_purchases,
+    COALESCE(SUM(p.amount_spent), 0) AS total_spent,
+    p.currency -- Assuming currency is stored in purchase table
+FROM user u
+CROSS JOIN videogame v
+LEFT JOIN purchase p ON u.user_id = p.user_id AND v.game_id = p.game_id
+GROUP BY u.user_id, u.username, v.game_id, v.title, p.currency;
