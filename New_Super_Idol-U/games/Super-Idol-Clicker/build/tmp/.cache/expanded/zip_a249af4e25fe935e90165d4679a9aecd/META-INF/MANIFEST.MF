@@ -1,0 +1,45 @@
+Manifest-Version: 1.0
+Created-By: Apache Maven Bundle Plugin
+Build-Jdk-Spec: 11
+Automatic-Module-Name: org.eclipse.jetty.http
+Implementation-Vendor: Eclipse Jetty Project
+Implementation-Version: 9.4.48.v20220622
+url: https://eclipse.org/jetty
+Bnd-LastModified: 1655844177362
+Build-Jdk: 11.0.15
+Built-By: joakim
+Bundle-Classpath: .
+Bundle-Copyright: Copyright (c) 2008-2022 Mort Bay Consulting Pty Ltd an
+ d others.
+Bundle-Description: Jetty module for Jetty :: Http Utility
+Bundle-DocURL: https://eclipse.org/jetty
+Bundle-License: http://www.apache.org/licenses/LICENSE-2.0, https://www.
+ eclipse.org/org/documents/epl-v10.php
+Bundle-ManifestVersion: 2
+Bundle-Name: Jetty :: Http Utility
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-SymbolicName: org.eclipse.jetty.http
+Bundle-Vendor: Eclipse Jetty Project
+Bundle-Version: 9.4.48.v20220622
+Export-Package: org.eclipse.jetty.http;version="9.4.48";uses:="javax.ser
+ vlet,javax.servlet.http,org.eclipse.jetty.io,org.eclipse.jetty.util,org
+ .eclipse.jetty.util.component,org.eclipse.jetty.util.log,org.eclipse.je
+ tty.util.resource",org.eclipse.jetty.http.pathmap;version="9.4.48";uses
+ :="org.eclipse.jetty.util.annotation,org.eclipse.jetty.util.component"
+Import-Package: javax.servlet;version="[3.1.0,4)",javax.servlet.http;ver
+ sion="[3.1.0,4)",org.eclipse.jetty.io;version="[9.4.48,10)",org.eclipse
+ .jetty.util;version="[9.4.48,10)",org.eclipse.jetty.util.annotation;ver
+ sion="[9.4.48,10)",org.eclipse.jetty.util.component;version="[9.4.48,10
+ )",org.eclipse.jetty.util.log;version="[9.4.48,10)",org.eclipse.jetty.u
+ til.resource;version="[9.4.48,10)"
+Originally-Created-By: Apache Maven Bundle Plugin
+Provide-Capability: osgi.serviceloader;osgi.serviceloader="org.eclipse.j
+ etty.http.HttpFieldPreEncoder"
+Require-Capability: osgi.serviceloader;filter:="(osgi.serviceloader=org.
+ eclipse.jetty.http.HttpFieldPreEncoder)";resolution:=optional;cardinali
+ ty:=multiple,osgi.extender;filter:="(osgi.extender=osgi.serviceloader.p
+ rocessor)";resolution:=optional,osgi.extender;filter:="(osgi.extender=o
+ sgi.serviceloader.registrar)";resolution:=optional,osgi.ee;filter:="(&(
+ osgi.ee=JavaSE)(version=1.8))"
+Tool: Bnd-3.5.0.201709291849
+
