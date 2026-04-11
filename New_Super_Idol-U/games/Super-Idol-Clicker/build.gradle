@@ -1,0 +1,78 @@
+/*
+ * =============================================================================
+ * SUPER IDOL CLICKER - Build Configuration
+ * =============================================================================
+ * A Cookie Clicker-style idle game with Super Idol theme
+ * 
+ * @author  Fruit Salad Ltd.
+ * @version 1.0.0
+ * =============================================================================
+ */
+
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group = 'com.fruitsalad'
+version = '1.0.0'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+application {
+    mainClass = 'com.fruitsalad.Main'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // MySQL Connector for database connection
+    implementation 'com.mysql:mysql-connector-j:8.2.0'
+    
+    // Gson for JSON serialization (save/load)
+    implementation 'com.google.code.gson:gson:2.10.1'
+}
+
+// Ensure resources are included
+sourceSets {
+    main {
+        resources {
+            srcDirs = ['src/main/resources']
+        }
+    }
+}
+
+jar {
+    manifest {
+        attributes(
+            'Main-Class': 'com.fruitsalad.Main',
+            'Implementation-Title': 'Super Idol Clicker',
+            'Implementation-Version': version
+        )
+    }
+    
+    // Create fat JAR with all dependencies
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+// Custom run task with console output
+tasks.register('runGame', JavaExec) {
+    group = 'application'
+    description = 'Run Super Idol Clicker'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.fruitsalad.Main'
+    standardInput = System.in
+}
