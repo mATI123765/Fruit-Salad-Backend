@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Main-Class: com.fruitsalad.Main
+Implementation-Title: Super Idol Clicker
+Implementation-Version: 1.0.0
+

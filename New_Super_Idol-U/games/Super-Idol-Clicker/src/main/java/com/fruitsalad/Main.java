@@ -1,5 +1,17 @@
 package com.fruitsalad;
 
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.sql.SQLException;
+
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+import javax.swing.Timer;
+import javax.swing.UIManager;
+
 import com.fruitsalad.audio.SoundManager;
 import com.fruitsalad.database.DatabaseConnection;
 import com.fruitsalad.database.DatabaseManager;
@@ -7,46 +19,31 @@ import com.fruitsalad.game.GamePanel;
 import com.fruitsalad.game.GameState;
 import com.fruitsalad.ui.MenuPanel;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.sql.SQLException;
-
 /**
  * =============================================================================
  * SUPER IDOL CLICKER
  * =============================================================================
- * A Cookie Clicker-style idle game with Super Idol theme.
+ * A Clicker-style idle game with Super Idol theme.
  * 
  * The smile sweeter than honey, the love hotter than 105 degrees.
  * 
- * @author  Fruit Salad Ltd. (Jorge, Joel, Iker, Zakaria)
+ * @author  Fruit Salad Ltd. (Jorge Ferrando)
  * @version 1.0.0
  * =============================================================================
  */
 public class Main {
     
-    // =========================================================================
-    // CONSTANTS
-    // =========================================================================
-    
+    /* CONSTANTS */
     private static final String GAME_TITLE = "Super Idol Clicker";
     private static final int WINDOW_WIDTH = 1200;
     private static final int WINDOW_HEIGHT = 800;
     
-    // =========================================================================
-    // INSTANCE VARIABLES
-    // =========================================================================
-    
+    /* INSTANCE VARIABLES */
     private static JFrame mainFrame;
     private static MenuPanel menuPanel;
     private static DatabaseManager dbManager;
     
-    // =========================================================================
-    // ENTRY POINT
-    // =========================================================================
-    
+    /* ENTRY POINT */
     /**
      * Main entry point for the application.
      * 
@@ -67,6 +64,7 @@ public class Main {
         }
         
         // Print startup message
+        System.out.println();
         System.out.println("============================================");
         System.out.println("       SUPER IDOL CLICKER v1.0.0");
         System.out.println("         by Fruit Salad Ltd.");
@@ -83,10 +81,7 @@ public class Main {
         SwingUtilities.invokeLater(Main::createAndShowGUI);
     }
     
-    // =========================================================================
-    // INITIALIZATION
-    // =========================================================================
-    
+    /* INITIALIZATION */
     /**
      * Initializes the database connection.
      * 
@@ -139,10 +134,7 @@ public class Main {
         );
     }
     
-    // =========================================================================
-    // GUI CREATION
-    // =========================================================================
-    
+    /* GUI CREATION */  
     /**
      * Creates and displays the main window.
      */
@@ -190,10 +182,7 @@ public class Main {
         mainFrame.repaint();
     }
     
-    // =========================================================================
-    // LOGIN HANDLING
-    // =========================================================================
-    
+    /* LOGIN HANDLING */
     /**
      * Handles user login attempt.
      * 
@@ -207,7 +196,7 @@ public class Main {
             if (userId > 0) {
                 // Login successful
                 System.out.println("[Main] Login successful for: " + username);
-                menuPanel.showSuccess("Login successful!");
+                menuPanel.showSuccess("Login successful");
                 
                 // Small delay for visual feedback
                 Timer delayTimer = new Timer(500, e -> {
@@ -228,10 +217,7 @@ public class Main {
         }
     }
     
-    // =========================================================================
-    // GAME LAUNCH
-    // =========================================================================
-    
+    /* GAME LAUNCH */
     /**
      * Launches the main game.
      * 
@@ -340,6 +326,6 @@ public class Main {
         // Close database connection
         DatabaseConnection.closeConnection();
         
-        System.out.println("[Main] Goodbye!");
+        System.out.println("[Main] Goodbye bro");
     }
 }

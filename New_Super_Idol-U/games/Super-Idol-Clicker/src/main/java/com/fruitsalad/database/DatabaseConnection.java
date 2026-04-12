@@ -34,7 +34,7 @@ public class DatabaseConnection {
     private static final String USER = "root";
     
     /** Database password - CHANGE THIS TO YOUR PASSWORD */
-    private static final String PASSWORD = "";
+    private static final String PASSWORD = "brackyt76839@19";
     
     /** JDBC connection URL */
     private static final String URL = String.format(
