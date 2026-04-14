@@ -47,10 +47,7 @@ import com.fruitsalad.audio.SoundManager;
  */
 public class MenuPanel extends JPanel implements ActionListener {
     
-    // =========================================================================
-    // CONSTANTS
-    // =========================================================================
-    
+    /* CONSTANTS */
     private static final Color BACKGROUND_DARK = new Color(25, 25, 30);
     private static final Color BACKGROUND_LIGHT = new Color(45, 45, 55);
     private static final Color ACCENT_RED = new Color(200, 50, 50);
@@ -61,20 +58,14 @@ public class MenuPanel extends JPanel implements ActionListener {
     private static final Color INPUT_BG = new Color(55, 55, 65);
     private static final Color BUTTON_HOVER = new Color(220, 70, 70);
     
-    // =========================================================================
-    // ANIMATION
-    // =========================================================================
-    
+    /* ANIMATION */    
     private final Timer animationTimer;
     private final List<Particle> particles;
     private final List<FloatingIcon> floatingIcons;
     private final Random random;
     private float titlePulse = 0;
     
-    // =========================================================================
-    // UI COMPONENTS
-    // =========================================================================
-    
+    /* UI COMPONENTS */
     private JTextField usernameField;
     private JPasswordField passwordField;
     private JButton loginButton;
@@ -82,10 +73,7 @@ public class MenuPanel extends JPanel implements ActionListener {
     private JButton[] quickLoginButtons;
     private BufferedImage superIdolImage;
     
-    // =========================================================================
-    // CALLBACK
-    // =========================================================================
-    
+    /* CALLBACK */
     private LoginCallback loginCallback;
     
     /**
@@ -95,10 +83,7 @@ public class MenuPanel extends JPanel implements ActionListener {
         void onLogin(String username, String passwordHash);
     }
     
-    // =========================================================================
-    // PARTICLE CLASS
-    // =========================================================================
-    
+    /* PARTICLE CLASS */    
     private static class Particle {
         double x, y;
         double vx, vy;
@@ -133,10 +118,7 @@ public class MenuPanel extends JPanel implements ActionListener {
         }
     }
     
-    // =========================================================================
-    // FLOATING ICON CLASS
-    // =========================================================================
-    
+    /* FLOATING ICON CLASS */
     private static class FloatingIcon {
         double x, y;
         double angle;
@@ -168,10 +150,7 @@ public class MenuPanel extends JPanel implements ActionListener {
         }
     }
     
-    // =========================================================================
-    // CONSTRUCTOR
-    // =========================================================================
-    
+    /* CONSTRUCTOR */
     /**
      * Creates the menu panel with animated background.
      */
@@ -208,10 +187,7 @@ public class MenuPanel extends JPanel implements ActionListener {
         });
     }
     
-    // =========================================================================
-    // INITIALIZATION
-    // =========================================================================
-    
+    /* INITIALIZATION */
     /**
      * Loads images for the menu.
      */
@@ -280,7 +256,7 @@ public class MenuPanel extends JPanel implements ActionListener {
         add(statusLabel);
         
         // Quick login buttons
-        String[] testUsers = {"Jorgito", "Joel", "Iker", "Zakaria"};
+        String[] testUsers = {"Jorgito", "Matias", "Iker", "Zakaria"};
         quickLoginButtons = new JButton[testUsers.length];
         
         for (int i = 0; i < testUsers.length; i++) {
@@ -369,20 +345,20 @@ public class MenuPanel extends JPanel implements ActionListener {
         int startY = centerY - 20;
         
         // Username field
-        usernameField.setBounds(centerX - fieldWidth/2, startY, fieldWidth, fieldHeight);
+        usernameField.setBounds(centerX - fieldWidth/2, startY + 4, fieldWidth, fieldHeight);
         
         // Password field
-        passwordField.setBounds(centerX - fieldWidth/2, startY + 60, fieldWidth, fieldHeight);
+        passwordField.setBounds(centerX - fieldWidth/2, startY + 80, fieldWidth, fieldHeight);
         
         // Login button
-        loginButton.setBounds(centerX - buttonWidth/2, startY + 135, buttonWidth, buttonHeight);
+        loginButton.setBounds(centerX - buttonWidth/2, startY + 145, buttonWidth, buttonHeight);
         
         // Status label
-        statusLabel.setBounds(centerX - 200, startY + 195, 400, 25);
+        statusLabel.setBounds(centerX - 200, startY + 200, 400, 25);
         
         // Quick login buttons
         int quickBtnWidth = 65;
-        int quickBtnHeight = 30;
+        int quickBtnHeight = 40;
         int totalQuickWidth = quickBtnWidth * 4 + 15;
         int quickStartX = centerX - totalQuickWidth / 2;
         
@@ -396,10 +372,7 @@ public class MenuPanel extends JPanel implements ActionListener {
         }
     }
     
-    // =========================================================================
-    // PAINTING
-    // =========================================================================
-    
+    /* PAINTING */    
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -504,8 +477,8 @@ public class MenuPanel extends JPanel implements ActionListener {
      * Draws the login panel background.
      */
     private void drawLoginPanel(Graphics2D g2d) {
-        int panelWidth = 340;
-        int panelHeight = 320;
+        int panelWidth = 400;
+        int panelHeight = 370;
         int x = getWidth() / 2 - panelWidth / 2;
         int y = getHeight() / 2 - 60;
         
@@ -600,13 +573,10 @@ public class MenuPanel extends JPanel implements ActionListener {
         g2d.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         
         g2d.drawString("Username", centerX - 135, startY - 8);
-        g2d.drawString("Password", centerX - 135, startY + 52);
+        g2d.drawString("Password", centerX - 135, startY + 73);
     }
     
-    // =========================================================================
-    // ANIMATION
-    // =========================================================================
-    
+    /* ANIMATION */    
     @Override
     public void actionPerformed(ActionEvent e) {
         // Update animation time
@@ -635,10 +605,7 @@ public class MenuPanel extends JPanel implements ActionListener {
         repaint();
     }
     
-    // =========================================================================
-    // LOGIN
-    // =========================================================================
-    
+    /* LOGIN */
     /**
      * Attempts to login with current credentials.
      */
@@ -688,10 +655,7 @@ public class MenuPanel extends JPanel implements ActionListener {
         statusLabel.setText(message);
     }
     
-    // =========================================================================
-    // CLEANUP
-    // =========================================================================
-    
+    /* CLEANUP */
     /**
      * Stops animation and releases resources.
      */

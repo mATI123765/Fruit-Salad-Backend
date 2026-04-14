@@ -92,9 +92,7 @@ public class Main {
         
         try {
             // Test connection
-            if (!DatabaseConnection.testConnection()) {
-                return false;
-            }
+            if (!DatabaseConnection.testConnection()) { return false; }
             
             // Create database manager
             dbManager = new DatabaseManager();
@@ -149,9 +147,7 @@ public class Main {
         // Handle window closing
         mainFrame.addWindowListener(new WindowAdapter() {
             @Override
-            public void windowClosing(WindowEvent e) {
-                handleExit();
-            }
+            public void windowClosing(WindowEvent e) {  handleExit(); }
         });
         
         // Create and show menu
@@ -228,9 +224,7 @@ public class Main {
         System.out.println("[Main] Launching game for: " + username);
         
         // Dispose menu
-        if (menuPanel != null) {
-            menuPanel.dispose();
-        }
+        if (menuPanel != null) { menuPanel.dispose(); }
         
         // Update window title
         mainFrame.setTitle(GAME_TITLE + " - " + username);
@@ -258,14 +252,10 @@ public class Main {
                 handleGameExit(gamePanel);
             }
         });
-        
         System.out.println("[Main] Game started successfully");
     }
     
-    // =========================================================================
-    // EXIT HANDLING
-    // =========================================================================
-    
+    /* EXIT HANDLING */
     /**
      * Handles application exit from menu.
      */

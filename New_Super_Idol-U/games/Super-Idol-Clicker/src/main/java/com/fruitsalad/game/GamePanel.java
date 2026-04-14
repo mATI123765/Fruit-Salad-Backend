@@ -8,8 +8,10 @@ import java.awt.FontMetrics;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -45,10 +47,7 @@ import com.fruitsalad.database.DatabaseManager;
  */
 public class GamePanel extends JPanel implements ActionListener {
     
-    // =========================================================================
-    // COLORS (Cookie Clicker Dark Theme)
-    // =========================================================================
-    
+    /* COLORS (Dark Theme) */
     private static final Color BG_DARK = new Color(28, 28, 35);
     private static final Color BG_LEFT = new Color(35, 35, 45);
     private static final Color BG_CENTER = new Color(20, 25, 35);
@@ -62,33 +61,22 @@ public class GamePanel extends JPanel implements ActionListener {
     private static final Color UPGRADE_BG = new Color(55, 50, 65);
     private static final Color UPGRADE_HOVER = new Color(70, 65, 85);
     private static final Color UPGRADE_LOCKED = new Color(45, 45, 55);
-    
-    // =========================================================================
-    // LAYOUT
-    // =========================================================================
-    
+
+    /* LAYOUT */    
     private static final int LEFT_WIDTH = 280;
     private static final int RIGHT_WIDTH = 340;
     
-    // =========================================================================
-    // GAME DATA
-    // =========================================================================
-    
+    /* GAME DATA */
     private final GameState gameState;
     private final DatabaseManager dbManager;
     private List<Integer> unlockedAchievements;
     
-    // =========================================================================
-    // IMAGES
-    // =========================================================================
-    
+    /* IMAGES */
     private BufferedImage clickerImage;
+    private BufferedImage backgroundImage;
     private final java.util.Map<String, BufferedImage> upgradeImages = new java.util.HashMap<>();
     
-    // =========================================================================
-    // ANIMATION
-    // =========================================================================
-    
+    /* ANIMATION */
     private final Timer gameTimer;
     private final Timer autoSaveTimer;
     private final List<FloatingText> floatingTexts = new ArrayList<>();
@@ -102,19 +90,19 @@ public class GamePanel extends JPanel implements ActionListener {
     private int comboClicks = 0;
     private long lastClickTime = 0;
     
-    // =========================================================================
-    // UI STATE
-    // =========================================================================
-    
+    /* UI STATE */
     private Rectangle clickerBounds = new Rectangle();
     private boolean clickerHovered = false;
     private int hoveredUpgrade = -1;
     private int scrollOffset = 0;
+    // Achievements
+    private int achievementScrollOffset = 0;
+    private int maxAchievementScroll = 0;
+    private int hoveredAchievement = -1;
+    private String hoveredAchievementDesc = "";
+    private Rectangle achievementAreaBounds = new Rectangle();
     
-    // =========================================================================
-    // FLOATING TEXT
-    // =========================================================================
-    
+    /* FLOATING TEXT */
     private static class FloatingText {
         float x, y, vy, alpha;
         String text;
@@ -140,10 +128,7 @@ public class GamePanel extends JPanel implements ActionListener {
         boolean isDead() { return alpha <= 0; }
     }
     
-    // =========================================================================
-    // PARTICLE
-    // =========================================================================
-    
+    /* PARTICLE */
     private static class Particle {
         float x, y, vx, vy, alpha, size;
         Color color;
@@ -172,10 +157,7 @@ public class GamePanel extends JPanel implements ActionListener {
         boolean isDead() { return alpha <= 0 || size < 1; }
     }
     
-    // =========================================================================
-    // CONSTRUCTOR
-    // =========================================================================
-    
+    /* CONSTRUCTOR */
     public GamePanel(GameState gameState, DatabaseManager dbManager) {
         this.gameState = gameState;
         this.dbManager = dbManager;
@@ -208,8 +190,23 @@ public class GamePanel extends JPanel implements ActionListener {
         });
         
         addMouseWheelListener(e -> {
-            scrollOffset += e.getWheelRotation() * 30;
-            scrollOffset = Math.max(0, scrollOffset);
+            int mx = e.getX();
+            int scroll = e.getWheelRotation() * 25;
+
+            if (mx < LEFT_WIDTH) {
+                // Scroll achievements (left panel)
+                achievementScrollOffset += scroll;
+                achievementScrollOffset = Math.max(0, Math.min(achievementScrollOffset, maxAchievementScroll));
+            } else if (mx > getWidth() - RIGHT_WIDTH) {
+                // Scroll upgrades (right panel)
+                int totalUpgrades = GameState.UPGRADES.size();
+                int upgradeHeight = 85;
+                int visibleHeight = getHeight() - 70;
+                int maxScroll = Math.max(0, (totalUpgrades * upgradeHeight) - visibleHeight + 50);
+                
+                scrollOffset += scroll;
+                scrollOffset = Math.max(0, Math.min(scrollOffset, maxScroll));
+            }
             repaint();
         });
         
@@ -225,13 +222,11 @@ public class GamePanel extends JPanel implements ActionListener {
         SoundManager.getInstance().playGameMusic();
     }
     
-    // =========================================================================
-    // IMAGE LOADING
-    // =========================================================================
-    
+    /* IMAGE LOADING */
     private void loadImages() {
         try {
             clickerImage = loadImage("/images/main-image-clicker.png");
+            backgroundImage = loadImage("/images/game_background.png");
             
             // Load upgrade images
             for (String key : GameState.UPGRADES.keySet()) {
@@ -254,10 +249,7 @@ public class GamePanel extends JPanel implements ActionListener {
         return null;
     }
     
-    // =========================================================================
-    // PAINTING
-    // =========================================================================
-    
+    /* PAINTING */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -280,13 +272,15 @@ public class GamePanel extends JPanel implements ActionListener {
         // Draw floating texts
         drawFloatingTexts(g2);
         
+        // Draw achievement tooltip
+        if (hoveredAchievement >= 0 && !hoveredAchievementDesc.isEmpty()) {
+            drawAchievementTooltip(g2);
+        }
+        
         g2.dispose();
     }
     
-    // =========================================================================
-    // LEFT PANEL - STATS
-    // =========================================================================
-    
+    /* LEFT PANEL - STATS */
     private void drawLeftPanel(Graphics2D g2, int x, int y, int w, int h) {
         // Background
         g2.setColor(BG_LEFT);
@@ -343,6 +337,151 @@ public class GamePanel extends JPanel implements ActionListener {
         drawStatBox(g2, x + 15, py, w - 30, "Total Earned", 
             GameState.formatNumber(gameState.getTotalCreditsEarned()), GOLD);
         
+        // Achievements section
+        py += 60;
+        g2.setColor(new Color(70, 70, 80));
+        g2.drawLine(x + 20, py, x + w - 20, py);
+        
+        py += 20;
+        g2.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        g2.setColor(GOLD);
+        drawCenteredString(g2, "ACHIEVEMENTS", x, py, w);
+        
+        py += 10;
+        
+        // Achievements scrollable area
+        int achievementStartY = py;
+        int achievementAreaHeight = h - py - 130; // Space for buttons at bottom
+        
+        // Clip to achievements area
+        Shape oldClip = g2.getClip();
+        g2.setClip(x + 5, achievementStartY, w - 10, achievementAreaHeight);
+        
+        try {
+            List<Map<String, Object>> achievements = dbManager.getGameAchievements();
+            int achievementCount = achievements.size();
+            int unlockedCount = 0;
+            
+            // Count unlocked
+            for (Map<String, Object> achievement : achievements) {
+                int id = (int) achievement.get("id");
+                if (unlockedAchievements.contains(id)) unlockedCount++;
+            }
+            
+            // Draw achievements with scroll offset
+            int achY = achievementStartY + 10 - achievementScrollOffset;
+            int achIndex = 0;
+            
+            // Store achievement area bounds for mouse detection
+            achievementAreaBounds.setBounds(x + 5, achievementStartY, w - 10, achievementAreaHeight);
+            
+            for (Map<String, Object> achievement : achievements) {
+                int id = (int) achievement.get("id");
+                String name = (String) achievement.get("name");
+                String description = (String) achievement.get("description");
+                boolean isSecret = (boolean) achievement.get("isSecret");
+                boolean isUnlocked = unlockedAchievements.contains(id);
+                boolean isHovered = (hoveredAchievement == achIndex);
+                
+                // Only draw if visible
+                if (achY > achievementStartY - 30 && achY < achievementStartY + achievementAreaHeight) {
+                    // Achievement row - highlight if hovered
+                    if (isHovered) {
+                        g2.setColor(new Color(70, 70, 90));
+                    } else if (isUnlocked) {
+                        g2.setColor(new Color(45, 55, 45));
+                    } else {
+                        g2.setColor(new Color(45, 45, 55));
+                    }
+                    g2.fillRoundRect(x + 12, achY, w - 24, 26, 6, 6);
+                    
+                    // Border if hovered
+                    if (isHovered) {
+                        g2.setColor(GOLD);
+                        g2.drawRoundRect(x + 12, achY, w - 24, 26, 6, 6);
+                    }
+                    
+                    // Icon
+                    if (isUnlocked) {
+                        g2.setColor(GREEN);
+                        g2.fillOval(x + 18, achY + 5, 16, 16);
+                        g2.setColor(Color.WHITE);
+                        g2.setFont(new Font("Segoe UI", Font.BOLD, 11));
+                        g2.drawString("O", x + 23, achY + 17);
+                    } else {
+                        g2.setColor(new Color(80, 80, 90));
+                        g2.fillOval(x + 18, achY + 5, 16, 16);
+                        g2.setColor(new Color(60, 60, 70));
+                        g2.setFont(new Font("Segoe UI", Font.BOLD, 11));
+                        g2.drawString("?", x + 24, achY + 17);
+                    }
+                    
+                    // Name (show ??? if secret and not unlocked)
+                    g2.setFont(new Font("Segoe UI", Font.PLAIN, 10));
+                    String displayName = (isSecret && !isUnlocked) ? "???" : name;
+                    g2.setColor(isUnlocked ? TEXT_WHITE : TEXT_DARK);
+                    
+                    // Truncate long names
+                    if (displayName.length() > 20) {
+                        displayName = displayName.substring(0, 18) + "..";
+                    }
+                    g2.drawString(displayName, x + 40, achY + 17);
+                    
+                    // Store description for tooltip if hovered
+                    if (isHovered && !isSecret || (isSecret && isUnlocked)) {
+                        hoveredAchievementDesc = description;
+                    } else if (isHovered && isSecret && !isUnlocked) {
+                        hoveredAchievementDesc = "Secret achievement - Keep playing!";
+                    }
+                }
+                achY += 30;
+                achIndex++;
+            }
+            
+            // Calculate max scroll
+            int totalAchievementHeight = achievements.size() * 30;
+            maxAchievementScroll = Math.max(0, totalAchievementHeight - achievementAreaHeight + 20);
+            
+            // Restore clip
+            g2.setClip(oldClip);
+            
+            // Scroll indicators
+            if (achievementScrollOffset > 0) {
+                g2.setColor(new Color(255, 255, 255, 150));
+                int[] xPoints = {x + w/2 - 8, x + w/2 + 8, x + w/2};
+                int[] yPoints = {achievementStartY + 15, achievementStartY + 15, achievementStartY + 5};
+                g2.fillPolygon(xPoints, yPoints, 3);
+            }
+            if (achievementScrollOffset < maxAchievementScroll) {
+                g2.setColor(new Color(255, 255, 255, 150));
+                int bottomY = achievementStartY + achievementAreaHeight;
+                int[] xPoints = {x + w/2 - 8, x + w/2 + 8, x + w/2};
+                int[] yPoints = {bottomY - 15, bottomY - 15, bottomY - 5};
+                g2.fillPolygon(xPoints, yPoints, 3);
+            }
+            
+            // Progress bar below achievements area
+            int progressY = achievementStartY + achievementAreaHeight + 5;
+            g2.setColor(new Color(45, 45, 55));
+            g2.fillRoundRect(x + 15, progressY, w - 30, 22, 6, 6);
+            
+            if (achievementCount > 0) {
+                int progressWidth = (int) ((w - 34) * ((double) unlockedCount / achievementCount));
+                g2.setColor(GREEN);
+                g2.fillRoundRect(x + 17, progressY + 3, Math.max(0, progressWidth), 16, 4, 4);
+            }
+            
+            g2.setColor(TEXT_WHITE);
+            g2.setFont(new Font("Segoe UI", Font.BOLD, 10));
+            String progressText = unlockedCount + " / " + achievementCount;
+            drawCenteredString(g2, progressText, x, progressY + 16, w);
+            
+        } catch (SQLException e) {
+            g2.setClip(oldClip);
+            g2.setColor(TEXT_DARK);
+            g2.drawString("Error loading", x + 20, achievementStartY + 20);
+        }
+
         // Bottom controls
         py = h - 120;
         
@@ -378,28 +517,25 @@ public class GamePanel extends JPanel implements ActionListener {
         g2.drawString(value, x + 12, y + 36);
     }
     
-    // =========================================================================
-    // CENTER PANEL - CLICKER
-    // =========================================================================
-    
+    /* CENTER PANEL - CLICKER */
     private void drawCenterPanel(Graphics2D g2, int x, int y, int w, int h) {
-        // Animated gradient background
-        float hue = (backgroundOffset % 360) / 360f;
-        Color bgColor1 = Color.getHSBColor(hue * 0.1f, 0.3f, 0.12f);
-        Color bgColor2 = Color.getHSBColor(hue * 0.1f + 0.02f, 0.2f, 0.08f);
-        
-        GradientPaint bgGrad = new GradientPaint(x, y, bgColor1, x + w, h, bgColor2);
-        g2.setPaint(bgGrad);
-        g2.fillRect(x, y, w, h);
-        
-        // Subtle pattern
-        g2.setColor(new Color(255, 255, 255, 5));
-        for (int i = 0; i < w; i += 40) {
-            for (int j = 0; j < h; j += 40) {
-                if ((i + j) % 80 == 0) {
-                    g2.fillOval(x + i + 15, j + 15, 10, 10);
-                }
-            }
+        // Draw background image
+        if (backgroundImage != null) {
+            // Scale image to fill the panel
+            g2.drawImage(backgroundImage, x, y, w, h, null);
+            
+            // Dark overlay for better readability
+            g2.setColor(new Color(0, 0, 0, 150));
+            g2.fillRect(x, y, w, h);
+        } else {
+            // Fallback gradient if no image
+            float hue = (backgroundOffset % 360) / 360f;
+            Color bgColor1 = Color.getHSBColor(hue * 0.1f, 0.3f, 0.12f);
+            Color bgColor2 = Color.getHSBColor(hue * 0.1f + 0.02f, 0.2f, 0.08f);
+            
+            GradientPaint bgGrad = new GradientPaint(x, y, bgColor1, x + w, h, bgColor2);
+            g2.setPaint(bgGrad);
+            g2.fillRect(x, y, w, h);
         }
         
         // Clicker
@@ -459,10 +595,7 @@ public class GamePanel extends JPanel implements ActionListener {
             x, h - 40, w);
     }
     
-    // =========================================================================
-    // RIGHT PANEL - UPGRADES
-    // =========================================================================
-    
+    /* RIGHT PANEL - UPGRADES */    
     private void drawRightPanel(Graphics2D g2, int x, int y, int w, int h) {
         // Background
         g2.setColor(BG_RIGHT);
@@ -564,10 +697,7 @@ public class GamePanel extends JPanel implements ActionListener {
         }
     }
     
-    // =========================================================================
-    // PARTICLES AND EFFECTS
-    // =========================================================================
-    
+    /* PARTICLES AND EFFECTS */
     private void drawParticles(Graphics2D g2) {
         for (Particle p : particles) {
             if (p.alpha > 0) {
@@ -594,10 +724,7 @@ public class GamePanel extends JPanel implements ActionListener {
         }
     }
     
-    // =========================================================================
-    // INPUT HANDLING
-    // =========================================================================
-    
+    /* INPUT HANDLING */
     private void handleClick(int mx, int my) {
         // Check clicker
         if (clickerBounds.contains(mx, my)) {
@@ -647,6 +774,30 @@ public class GamePanel extends JPanel implements ActionListener {
                 new Cursor(Cursor.DEFAULT_CURSOR));
         }
         
+        // Check achievement hover (left panel)
+        int oldHoveredAchievement = hoveredAchievement;
+        hoveredAchievement = -1;
+        hoveredAchievementDesc = "";
+        
+        if (mx < LEFT_WIDTH && achievementAreaBounds.contains(mx, my)) {
+            // Calculate which achievement is being hovered
+            int relativeY = my - achievementAreaBounds.y + achievementScrollOffset - 10;
+            int achIndex = relativeY / 30;
+            
+            try {
+                List<Map<String, Object>> achievements = dbManager.getGameAchievements();
+                if (achIndex >= 0 && achIndex < achievements.size()) {
+                    hoveredAchievement = achIndex;
+                }
+            } catch (SQLException e) {
+                // Ignore
+            }
+        }
+        
+        if (hoveredAchievement != oldHoveredAchievement) {
+            repaint();
+        }
+        
         // Check upgrade hover
         int upgradeX = getWidth() - RIGHT_WIDTH + 10;
         int py = 65 - scrollOffset;
@@ -688,9 +839,7 @@ public class GamePanel extends JPanel implements ActionListener {
         lastClickTime = now;
         
         // Bonus for combo
-        if (comboClicks > 10) {
-            earned *= 1.5;
-        }
+        if (comboClicks > 10) { earned *= 1.5; }
         
         // Floating text
         String text = "+" + GameState.formatNumber(earned);
@@ -729,10 +878,7 @@ public class GamePanel extends JPanel implements ActionListener {
         }
     }
     
-    // =========================================================================
-    // GAME LOOP
-    // =========================================================================
-    
+    /* GAME LOOP */
     @Override
     public void actionPerformed(ActionEvent e) {
         // Animate clicker scale
@@ -763,18 +909,42 @@ public class GamePanel extends JPanel implements ActionListener {
         repaint();
     }
     
-    // =========================================================================
-    // ACHIEVEMENTS
-    // =========================================================================
-    
+    /* ACHIEVEMENTS */
     private void checkAchievements() {
         try {
+            // Clicks
             checkAchievement("First Click", gameState.getTotalClicks() >= 1);
             checkAchievement("100 Clicks", gameState.getTotalClicks() >= 100);
-            checkAchievement("1000 Clicks", gameState.getTotalClicks() >= 1000);
+            checkAchievement("1.000 Clicks", gameState.getTotalClicks() >= 1000);
+            checkAchievement("5.000 Clicks", gameState.getTotalClicks() >= 5000);
+            checkAchievement("15.000 Clicks", gameState.getTotalClicks() >= 15000);
+            checkAchievement("40.000 Clicks", gameState.getTotalClicks() >= 40000);
+            checkAchievement("105.000ºC Clicks", gameState.getTotalClicks() >= 105000);
+            // Social Credits
             checkAchievement("+15 Social Credit", gameState.getTotalCreditsEarned() >= 100);
             checkAchievement("Good Citizen", gameState.getTotalCreditsEarned() >= 1000);
+            checkAchievement("Model Citizen", gameState.getTotalCreditsEarned() >= 10000);
+            checkAchievement("Super Idol's Favorite", gameState.getTotalCreditsEarned() >= 100000);
+            checkAchievement("Super Idol's Best Friend", gameState.getTotalCreditsEarned() >= 1000000);
+            checkAchievement("Super Idol's Soulmate", gameState.getTotalCreditsEarned() >= 10000000);
+            checkAchievement("Super Idol's Other Half", gameState.getTotalCreditsEarned() >= 100000000);
+            checkAchievement("Super Idol's True Love", gameState.getTotalCreditsEarned() >= 1000000000);
+            checkAchievement("Samba do Janeiro", gameState.getTotalCreditsEarned() >= 15000000000L);
+            checkAchievement("John Xina", gameState.getTotalCreditsEarned() >= 100000000000L);
+            checkAchievement("Supreme Idol", gameState.getTotalCreditsEarned() >= 1000000000000L);
+            // Upgrades
             checkAchievement("First Upgrade", gameState.getTotalUpgrades() >= 1);
+            checkAchievement("Upgrade Collector", gameState.getTotalUpgrades() >= 10);
+            checkAchievement("Upgrade Enthusiast", gameState.getTotalUpgrades() >= 50);
+            checkAchievement("Upgrade Master", gameState.getTotalUpgrades() >= 200);
+            checkAchievement("Upgrade Hoarder", gameState.getTotalUpgrades() >= 500);
+            checkAchievement("Upgrade Addict", gameState.getTotalUpgrades() >= 1000);
+            checkAchievement("Upgrade Maniac", gameState.getTotalUpgrades() >= 5000);
+            checkAchievement("Upgrade Overlord", gameState.getTotalUpgrades() >= 20000);
+            checkAchievement("Upgrade God", gameState.getTotalUpgrades() >= 100000);
+            checkAchievement("Upgrade Legend", gameState.getTotalUpgrades() >= 500000);
+            // Playtime achievements
+            
         } catch (SQLException e) {
             System.err.println("[GamePanel] Achievement error");
         }
@@ -802,11 +972,68 @@ public class GamePanel extends JPanel implements ActionListener {
             }
         }
     }
+
+    private void drawAchievementTooltip(Graphics2D g2) {
+        // Get mouse position
+        Point mouse = getMousePosition();
+        if (mouse == null) return;
+        
+        int tooltipX = mouse.x + 15;
+        int tooltipY = mouse.y + 15;
+        
+        // Measure text
+        g2.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        FontMetrics fm = g2.getFontMetrics();
+        
+        // Word wrap for long descriptions
+        String[] words = hoveredAchievementDesc.split(" ");
+        java.util.List<String> lines = new ArrayList<>();
+        StringBuilder currentLine = new StringBuilder();
+        int maxWidth = 180;
+        
+        for (String word : words) {
+            String testLine = currentLine.length() > 0 ? currentLine + " " + word : word;
+            if (fm.stringWidth(testLine) > maxWidth && currentLine.length() > 0) {
+                lines.add(currentLine.toString());
+                currentLine = new StringBuilder(word);
+            } else {
+                currentLine = new StringBuilder(testLine);
+            }
+        }
+        if (currentLine.length() > 0) {
+            lines.add(currentLine.toString());
+        }
+        
+        int lineHeight = fm.getHeight();
+        int tooltipWidth = maxWidth + 20;
+        int tooltipHeight = lines.size() * lineHeight + 16;
+        
+        // Adjust position if tooltip goes off screen
+        if (tooltipX + tooltipWidth > getWidth()) {
+            tooltipX = mouse.x - tooltipWidth - 10;
+        }
+        if (tooltipY + tooltipHeight > getHeight()) {
+            tooltipY = mouse.y - tooltipHeight - 10;
+        }
+        
+        // Draw tooltip background
+        g2.setColor(new Color(30, 30, 40, 240));
+        g2.fillRoundRect(tooltipX, tooltipY, tooltipWidth, tooltipHeight, 8, 8);
+        
+        // Border
+        g2.setColor(GOLD);
+        g2.drawRoundRect(tooltipX, tooltipY, tooltipWidth, tooltipHeight, 8, 8);
+        
+        // Draw text
+        g2.setColor(TEXT_WHITE);
+        int textY = tooltipY + 14;
+        for (String line : lines) {
+            g2.drawString(line, tooltipX + 10, textY);
+            textY += lineHeight;
+        }
+    }
     
-    // =========================================================================
-    // DATA
-    // =========================================================================
-    
+    /* DATA */
     private void loadGameData() {
         try {
             Map<String, Double> stats = dbManager.getAllStats(gameState.getUserId());
@@ -847,10 +1074,7 @@ public class GamePanel extends JPanel implements ActionListener {
         if (autoSaveTimer != null) autoSaveTimer.stop();
     }
     
-    // =========================================================================
-    // UTILITY
-    // =========================================================================
-    
+    /* UTILITY */    
     private void drawCenteredString(Graphics2D g2, String text, int x, int y, int width) {
         FontMetrics fm = g2.getFontMetrics();
         int textX = x + (width - fm.stringWidth(text)) / 2;

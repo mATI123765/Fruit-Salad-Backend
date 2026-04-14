@@ -16,24 +16,21 @@ import java.sql.SQLException;
  * =============================================================================
  */
 public class DatabaseConnection {
-    
-    // =========================================================================
-    // DATABASE CONFIGURATION
-    // =========================================================================
-    
-    /** Database host address */
+    /* DATABASE CONFIGURATION */
+
+    // Database host address
     private static final String HOST = "localhost";
     
-    /** Database port */
+    // Database port
     private static final String PORT = "3306";
     
-    /** Database name */
+    // Database name
     private static final String DATABASE = "new_super_idol_u";
     
-    /** Database username */
+    // Database username
     private static final String USER = "root";
     
-    /** Database password - CHANGE THIS TO YOUR PASSWORD */
+    // Database password
     private static final String PASSWORD = "brackyt76839@19";
     
     /** JDBC connection URL */
@@ -42,10 +39,7 @@ public class DatabaseConnection {
         HOST, PORT, DATABASE
     );
     
-    // =========================================================================
-    // SINGLETON CONNECTION
-    // =========================================================================
-    
+    /* SINGLETON CONNECTION */
     private static Connection connection = null;
     
     /**
@@ -53,10 +47,7 @@ public class DatabaseConnection {
      */
     private DatabaseConnection() { }
     
-    // =========================================================================
-    // CONNECTION METHODS
-    // =========================================================================
-    
+    /* CONNECTION METHODS */
     /**
      * Gets the database connection.
      * Creates a new connection if one doesn't exist or has been closed.
@@ -116,25 +107,18 @@ public class DatabaseConnection {
         }
     }
     
-    // =========================================================================
-    // GETTERS
-    // =========================================================================
-    
+    /* GETTERS */    
     /**
      * Gets the database name.
      * 
      * @return The name of the connected database
      */
-    public static String getDatabaseName() {
-        return DATABASE;
-    }
+    public static String getDatabaseName() { return DATABASE; }
     
     /**
      * Gets the connection host.
      * 
      * @return The database host address
      */
-    public static String getHost() {
-        return HOST;
-    }
+    public static String getHost() { return HOST; }
 }

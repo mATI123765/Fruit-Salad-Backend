@@ -16,44 +16,32 @@ import java.util.Map;
  */
 public class GameState {
     
-    // =========================================================================
-    // PLAYER INFO
-    // =========================================================================
-    
+    /* PLAYER INFO */
     private final int userId;
     private final String username;
     private int sessionId;
     
-    // =========================================================================
-    // CORE STATISTICS
-    // =========================================================================
-    
-    /** Current spendable social credits */
+    /* CORE STATISTICS */
+    // Current spendable social credits
     private double socialCredits;
     
-    /** Total credits ever earned (for achievements) */
+    // Total credits ever earned (for achievements)
     private double totalCreditsEarned;
     
-    /** Total number of clicks */
+    // Total number of clicks
     private long totalClicks;
     
-    /** Credits earned per click */
+    // Credits earned per click
     private double creditsPerClick;
     
-    /** Passive credits earned per second */
+    // Passive credits earned per second
     private double creditsPerSecond;
     
-    // =========================================================================
-    // UPGRADES
-    // =========================================================================
-    
+    /* UPGRADES */
     /** Map of upgrade name to current level */
     private final Map<String, Integer> upgradeLevels;
     
-    // =========================================================================
-    // UPGRADE DEFINITIONS
-    // =========================================================================
-    
+    /* UPGRADE DEFINITIONS */
     /**
      * Upgrade data class containing all upgrade properties.
      */
@@ -147,12 +135,16 @@ public class GameState {
             "/images/shop/4-item.png",
             50000, 1.15, 0, 500
         ));
+
+        UPGRADES.put("rollito_primavera", new UpgradeData(
+            "Rollito Primavera", 
+            "+800 creditss per second", 
+            "/images/shop/5-item.png", 
+            75000, 1.15, 0, 750
+        ));
     }
     
-    // =========================================================================
-    // CONSTRUCTOR
-    // =========================================================================
-    
+    /* CONSTRUCTOR */
     /**
      * Creates a new game state for a player.
      * 
@@ -178,10 +170,7 @@ public class GameState {
         }
     }
     
-    // =========================================================================
-    // CLICK LOGIC
-    // =========================================================================
-    
+    /* CLICK LOGIC */
     /**
      * Processes a click and returns credits earned.
      * 
@@ -209,10 +198,7 @@ public class GameState {
         return 0;
     }
     
-    // =========================================================================
-    // UPGRADE LOGIC
-    // =========================================================================
-    
+    /* UPGRADE LOGIC */    
     /**
      * Gets the cost of the next level of an upgrade.
      * Formula: baseCost * (costMultiplier ^ currentLevel)
@@ -237,10 +223,7 @@ public class GameState {
     public boolean buyUpgrade(String upgradeKey) {
         double cost = getUpgradeCost(upgradeKey);
         
-        if (cost < 0 || socialCredits < cost) {
-            return false;
-        }
-        
+        if (cost < 0 || socialCredits < cost) { return false; }
         UpgradeData data = UPGRADES.get(upgradeKey);
         
         // Deduct cost
@@ -287,10 +270,7 @@ public class GameState {
         return upgradeLevels.values().stream().mapToInt(Integer::intValue).sum();
     }
     
-    // =========================================================================
-    // SAVE / LOAD
-    // =========================================================================
-    
+    /* SAVE/LOAD STATE */
     /**
      * Loads game state from a stats map (from database).
      * 
@@ -333,10 +313,7 @@ public class GameState {
         return stats;
     }
     
-    // =========================================================================
-    // GETTERS
-    // =========================================================================
-    
+    /* GETTERS */
     public int getUserId() { return userId; }
     public String getUsername() { return username; }
     public int getSessionId() { return sessionId; }
@@ -348,10 +325,7 @@ public class GameState {
     public double getCreditsPerClick() { return creditsPerClick; }
     public double getCreditsPerSecond() { return creditsPerSecond; }
     
-    // =========================================================================
-    // UTILITY
-    // =========================================================================
-    
+    /* UTILITY */    
     /**
      * Formats a number for display (K, M, B suffixes).
      * 
@@ -359,10 +333,13 @@ public class GameState {
      * @return Formatted string
      */
     public static String formatNumber(double number) {
-        if (number >= 1_000_000_000_000.0) {
+        if (number >= 1_000_000_000_000_000.0) {
+            return String.format("%.2fQd", number / 1_000_000_000_000_000.0);
+        } else if (number >= 1_000_000_000_000.0) {
             return String.format("%.2fT", number / 1_000_000_000_000.0);
         } else if (number >= 1_000_000_000) {
             return String.format("%.2fB", number / 1_000_000_000);
+            
         } else if (number >= 1_000_000) {
             return String.format("%.2fM", number / 1_000_000);
         } else if (number >= 1_000) {
