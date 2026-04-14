@@ -100,7 +100,7 @@ public class Main {
             // Setup game data (creates game/achievements if needed)
             dbManager.setupGame();
             
-            System.out.println("[Main] Database initialized successfully");
+            System.out.println("[Main] Database initialized successfully.");
             return true;
             
         } catch (SQLException e) {
@@ -156,7 +156,7 @@ public class Main {
         // Show frame
         mainFrame.setVisible(true);
         
-        System.out.println("[Main] Application started");
+        System.out.println("[Main] Application started.");
     }
     
     /**
@@ -192,7 +192,7 @@ public class Main {
             if (userId > 0) {
                 // Login successful
                 System.out.println("[Main] Login successful for: " + username);
-                menuPanel.showSuccess("Login successful");
+                menuPanel.showSuccess("Login successful.");
                 
                 // Small delay for visual feedback
                 Timer delayTimer = new Timer(500, e -> {
@@ -204,12 +204,12 @@ public class Main {
             } else {
                 // Login failed
                 System.out.println("[Main] Login failed for: " + username);
-                menuPanel.showError("Invalid username or password");
+                menuPanel.showError("Invalid username or password.");
             }
             
         } catch (SQLException e) {
             System.err.println("[Main] Login error: " + e.getMessage());
-            menuPanel.showError("Database error occurred");
+            menuPanel.showError("Database error occurred.");
         }
     }
     
@@ -252,7 +252,7 @@ public class Main {
                 handleGameExit(gamePanel);
             }
         });
-        System.out.println("[Main] Game started successfully");
+        System.out.println("[Main] Game started successfully.");
     }
     
     /* EXIT HANDLING */

@@ -1,7 +1,9 @@
 /* Cursor 3: This procedure batch updates stats for all users in a game (useful for events like "Double XP Weekend"). */
 USE new_super_idol_u;
 
-DELIMITER //
+DROP PROCEDURE IF EXISTS sp_batch_update_stats;
+
+DELIMITER $$
 
 CREATE PROCEDURE sp_batch_update_stats(
     IN p_game_id INT,
@@ -52,6 +54,6 @@ BEGIN
     
     -- Return count
     SET p_users_affected = v_count;
-END //
+END$$
 
 DELIMITER ;

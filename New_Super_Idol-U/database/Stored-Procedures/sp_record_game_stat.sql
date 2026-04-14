@@ -1,7 +1,9 @@
 /* Procedure 6: This procedure records or updates a game stadistic for a user */
 USE new_super_idol_u;
 
-DELIMITER //
+DROP PROCEDURE IF EXISTS sp_record_game_stat;
+
+DELIMITER $$
 
 CREATE PROCEDURE sp_record_game_stat(
     IN p_user_id INT,
@@ -81,6 +83,6 @@ BEGIN
             END IF;
         END IF;
     END IF;
-END //
+END$$
 
 DELIMITER ;

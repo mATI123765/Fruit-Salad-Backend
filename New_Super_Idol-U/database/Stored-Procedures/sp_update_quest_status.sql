@@ -1,7 +1,9 @@
 /* Procedure 5: This procedure updates the status of a side quest for a user */
 USE new_super_idol_u;
 
-DELIMITER //
+DROP PROCEDURE IF EXISTS sp_update_quest_status;
+
+DELIMITER $$
 
 CREATE PROCEDURE sp_update_quest_status(
     IN p_user_id INT,
@@ -9,7 +11,7 @@ CREATE PROCEDURE sp_update_quest_status(
     IN p_new_status ENUM('not_started', 'in_progress', 'completed'),
     OUT p_quest_name VARCHAR(100),
     OUT p_reward VARCHAR(255),
-    OUT p_result(150)
+    OUT p_result VARCHAR(150)
 )
 BEGIN
     -- Declare variables
@@ -32,7 +34,7 @@ BEGIN
     IF v_user_exists = 0 THEN
         SET p_quest_name = NULL;
         SET p_reward = NULL;
-        SET p_resutl = 'ERROR: User does not exist';
+        SET p_result = 'ERROR: User does not exist';
     ELSEIF v_quest_exists = 0 THEN
         SET p_quest_name = NULL;
         SET p_reward = NULL;
@@ -70,6 +72,6 @@ BEGIN
             SET p_result = CONCAT('SUCCESS: Quest "', p_quest_name, '" updated to', UPPER(p_new_status));
         END IF;
     END IF;
-END //
+END$$
 
 DELIMITER ;

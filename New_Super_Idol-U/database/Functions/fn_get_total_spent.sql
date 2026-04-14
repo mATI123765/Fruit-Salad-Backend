@@ -1,7 +1,9 @@
 /* Function 3: This function returns the total money spent by a user */
 USE new_super_idol_u;
 
-DELIMITER //
+DROP FUNCTION IF EXISTS fn_get_total_spent;
+
+DELIMITER $$
 
 CREATE FUNCTION fn_get_total_spent(
     p_user_id INT,
@@ -27,6 +29,6 @@ BEGIN
     END IF;
 
     RETURN v_total;
-END //
+END$$
 
 DELIMITER ;

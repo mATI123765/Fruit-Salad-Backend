@@ -621,7 +621,7 @@ public class MenuPanel extends JPanel implements ActionListener {
         // Generate password hash (simplified for demo)
         String passwordHash = "hashed_password_" +
             (username.contains("Jorgito") ? "1" :
-             username.contains("Joel") ? "2" :
+             username.contains("Matias") ? "2" :
              username.contains("Iker") ? "3" :
              username.contains("Zaka") ? "4" : "0");
         

@@ -1,7 +1,9 @@
 /* Function 1: This function returns the total playtime in hours */
 USE new_super_idol_u;
 
-DELIMITER //
+DROP FUNCTION IF EXISTS fn_get_total_playtime;
+
+DELIMITER $$
 
 CREATE FUNCTION fn_get_total_playtime(
     p_user_id INT,
@@ -16,12 +18,12 @@ BEGIN
     -- Sum all session durations
     SELECT COALESCE(SUM(duration_minutes), 0) INTO v_total_minutes
     FROM playtime
-    WHERE user_id = p_user id
+    WHERE user_id = p_user_id
         AND game_id = p_game_id
         AND end_time IS NOT NULL;
 
     -- Return hours (with 2 decimals)
     RETURN ROUND(v_total_minutes / 60, 2);
-END //
+END$$
 
 DELIMITER ;

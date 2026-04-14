@@ -1,7 +1,9 @@
 /* Trigger 1: This trigger automatically calculates duration when a session ends */
 USE new_super_idol_u;
 
-DELIMITER //
+DROP TRIGGER IF EXISTS tr_playtime_before_update;
+
+DELIMITER $$
 
 CREATE TRIGGER tr_playtime_before_update
 BEFORE UPDATE ON playtime
@@ -15,6 +17,6 @@ BEGIN
             SET MESSAGE_TEXT = 'ERROR: end_time cannot be before start_time';
         END IF;
     END IF;
-END //
+END$$
 
 DELIMITER ;

@@ -1,7 +1,9 @@
 /* Cursor 1: This procedure generates a complete gaming report for a specific user, showing all games with their stats. */
 USE new_super_idol_u;
 
-DELIMITER //
+DROP PROCEDURE IF EXISTS sp_generate_user_report;
+
+DELIMITER $$
 
 CREATE PROCEDURE sp_generate_user_report(
     IN p_user_id INT
@@ -89,6 +91,6 @@ BEGIN
     
     -- Cleanup
     DROP TEMPORARY TABLE IF EXISTS temp_user_report;
-END //
+END$$
 
 DELIMITER ;

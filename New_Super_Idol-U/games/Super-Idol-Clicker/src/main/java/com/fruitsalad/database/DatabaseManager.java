@@ -207,12 +207,12 @@ public class DatabaseManager {
         }
         
         String insertSql = "INSERT INTO videogame (game_id, title, genre, release_date, developer, publisher) " +
-                          "VALUES (?, 'Super Idol Clicker', 'Idle/Clicker', CURDATE(), 'Fruit Salad Ltd.', 'Fruit Salad Ltd.')";
+                          "VALUES (?, 'Super Idol Clicker', 'Idle/Clicker', CURDATE(), 'Jorge Ferrando', 'Fruit Salad Ltd.')";
         try (PreparedStatement stmt = connection.prepareStatement(insertSql)) {
             stmt.setInt(1, GAME_ID);
             stmt.executeUpdate();
         }
-        setupAchievements();
+        setupAchievements();    
     }
     
     private void setupAchievements() throws SQLException {
@@ -274,5 +274,5 @@ public class DatabaseManager {
                 stmt.executeUpdate();
             }
         }
-    }
+    }   
 }

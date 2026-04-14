@@ -1,7 +1,9 @@
 /* Procedure 1: This procedure unlocks an achievement for a user */
 USE new_super_idol_u;
 
-DELIMITER //
+DROP PROCEDURE IF EXISTS sp_unlock_achievement;
+
+DELIMITER $$
 
 CREATE PROCEDURE sp_unlock_achievement(
     IN p_user_id INT,
@@ -39,10 +41,10 @@ BEGIN
     ELSE
         -- Insert the achievement
         INSERT INTO user_achievement (user_id, achievement_id, unlocked_at)
-        VALUES (p_user_id, p_achievement_id, NOW())
+        VALUES (p_user_id, p_achievement_id, NOW());
 
         SET p_result = 'SUCCESS: Achievement unlocked!';
     END IF;
-END //
+END$$
 
 DELIMITER ;

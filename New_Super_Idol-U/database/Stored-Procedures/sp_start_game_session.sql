@@ -1,7 +1,9 @@
 /* Procedure 2: This procedure starts a new gaming session for a user*/
 USE new_super_idol_u;
 
-DELIMITER //
+DROP PROCEDURE IF EXISTS sp_start_game_session;
+
+DELIMITER $$
 
 CREATE PROCEDURE sp_start_game_session(
     IN p_user_id INT,
@@ -41,6 +43,6 @@ BEGIN
 
         SET p_result = CONCAT('SUCCESS: Session started! Session ID: ', p_session_id);
     END IF;
-END //
+END$$
 
 DELIMITER ;

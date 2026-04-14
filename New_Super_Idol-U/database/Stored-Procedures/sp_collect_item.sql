@@ -1,7 +1,9 @@
 /* Procedure 4: This procedure adds a collectable to a user's inventory */
 USE new_super_idol_u;
 
-DELIMITER //
+DROP PROCEDURE IF EXISTS sp_collect_item;
+
+DELIMITER $$
 
 CREATE PROCEDURE sp_collect_item(
     IN p_user_id INT,
@@ -59,6 +61,6 @@ BEGIN
 
         SET p_result = CONCAT('SUCCESS: Collected "', p_item_name, '" (', UPPER(p_rarity), ')');
     END IF;
-END //
+END$$
 
 DELIMITER ;

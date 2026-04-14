@@ -1,7 +1,9 @@
 /* Cursor 2: This procedure generates a leaderboard for a specific game, ranking users by achievement completion. */
 USE new_super_idol_u;
 
-DELIMITER //
+DROP PROCEDURE IF EXISTS sp_generate_leaderboard;
+
+DELIMITER $$
 
 CREATE PROCEDURE sp_generate_leaderboard(
     IN p_game_id INT
@@ -107,6 +109,6 @@ BEGIN
     
     -- Cleanup
     DROP TEMPORARY TABLE IF EXISTS temp_leaderboard;
-END //
+END$$
 
 DELIMITER ;

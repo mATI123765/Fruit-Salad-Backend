@@ -1,7 +1,9 @@
 /* Function 4: This function returns a specific stat value for a user in a game */
 USE new_super_idol_u;
 
-DELIMITER //
+DROP FUNCTION IF EXISTS fn_get_game_stat;
+
+DELIMITER $$
 
 CREATE FUNCTION fn_get_game_stat(
     p_user_id INT,
@@ -21,6 +23,6 @@ BEGIN
         AND stat_name = p_stat_name;
     
     RETURN v_stat_value;
-END //
+END$$
 
 DELIMITER ;

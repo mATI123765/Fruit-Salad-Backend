@@ -1,7 +1,9 @@
 /* Procedure 3: This procedure ends a gaming session */
 USE new_super_idol_u;
 
-DELIMITER //
+DROP PROCEDURE IF EXISTS sp_end_game_session;
+
+DELIMITER $$
 
 CREATE PROCEDURE sp_end_game_session(
     IN p_session_id INT,
@@ -44,6 +46,6 @@ BEGIN
 
         SET p_result = CONCAT('SUCCESS: Session ended! Duration: ', p_duration_minutes, 'minutes');
     END IF;
-END //
+END$$
 
 DELIMITER ;

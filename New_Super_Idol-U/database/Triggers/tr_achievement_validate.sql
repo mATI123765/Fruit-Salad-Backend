@@ -3,7 +3,9 @@ the user doesn't own (if you add a user_videogame ownership table later) and pre
 duplicate unlocks. */
 USE new_super_idol_u;
 
-DELIMITER //
+DROP TRIGGER IF EXISTS tr_achievement_before_insert;
+
+DELIMITER $$
 
 CREATE TRIGGER tr_achievement_before_insert
 BEFORE INSERT ON user_achievement
@@ -31,6 +33,6 @@ BEGIN
     IF NEW.unlocked_at IS NULL THEN
         SET NEW.unlocked_at = NOW();
     END IF;
-END //
+END$$
 
 DELIMITER ;

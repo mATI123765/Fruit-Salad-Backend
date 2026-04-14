@@ -1,7 +1,9 @@
 /* Function 2: This function returns the achievement completion percentage */
 USE new_super_idol_u;
 
-DELIMITER //
+DROP FUNCTION IF EXISTS fn_get_achievement_percentage;
+
+DELIMITER $$
 
 CREATE FUNCTION fn_get_achievement_percentage(
     p_user_id INT,
@@ -33,6 +35,6 @@ BEGIN
 
     -- Return percentage
     RETURN ROUND((v_unlocked_achievement / v_total_achievements) * 100, 2);
-END //
+END$$
 
 DELIMITER ;
