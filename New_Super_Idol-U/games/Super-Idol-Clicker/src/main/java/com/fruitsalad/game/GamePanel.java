@@ -83,12 +83,14 @@ public class GamePanel extends JPanel implements ActionListener {
     private final List<Particle> particles = new ArrayList<>();
     private final Random random = new Random();
     
+    /* Clicks variables */
     private float clickerAngle = 0;
     private float clickerScale = 1.0f;
     private float targetScale = 1.0f;
     private float backgroundOffset = 0;
     private int comboClicks = 0;
     private long lastClickTime = 0;
+    private long lastPassiveIncomeTime = 0;
     
     /* UI STATE */
     private Rectangle clickerBounds = new Rectangle();
@@ -210,6 +212,9 @@ public class GamePanel extends JPanel implements ActionListener {
             repaint();
         });
         
+        // Initialize passive income timer
+        lastPassiveIncomeTime = System.currentTimeMillis();
+
         // Game loop - 60 FPS
         gameTimer = new Timer(16, this);
         gameTimer.start();
@@ -900,12 +905,26 @@ public class GamePanel extends JPanel implements ActionListener {
             comboClicks = Math.max(0, comboClicks - 1);
         }
         
-        // Passive income (per frame at 60fps)
-        if (gameState.getCreditsPerSecond() > 0) {
-            // We handle passive income in GameState already via passiveIncome()
-            // But for smooth display, we'll add small amounts each frame
+        // Passive income - apply CPS every second
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - lastPassiveIncomeTime >= 1000) {
+            if (gameState.getCreditsPerSecond() > 0) {
+                double earned = gameState.passiveIncome();
+
+                // Show floating text for passive income
+                if (earned > 0) {
+                    int centerX = LEFT_WIDTH + (getWidth() - LEFT_WIDTH - RIGHT_WIDTH) / 2;
+                    floatingTexts.add(new FloatingText(
+                        centerX - 30, getHeight() / 2 + 100,
+                        "+" + GameState.formatNumber(earned) + "/s", GREEN, 16
+                    ));
+                }
+                
+                // Check achievements
+                checkAchievements();
+            }
+            lastPassiveIncomeTime = currentTime;
         }
-        
         repaint();
     }
     
