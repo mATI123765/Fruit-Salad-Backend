@@ -938,16 +938,16 @@ public class GamePanel extends JPanel implements ActionListener {
             checkAchievement("5.000 Clicks", gameState.getTotalClicks() >= 5000);
             checkAchievement("15.000 Clicks", gameState.getTotalClicks() >= 15000);
             checkAchievement("40.000 Clicks", gameState.getTotalClicks() >= 40000);
-            checkAchievement("105.000ºC Clicks", gameState.getTotalClicks() >= 105000);
+            checkAchievement("105.000 Clicks", gameState.getTotalClicks() >= 105000);
             // Social Credits
             checkAchievement("+15 Social Credit", gameState.getTotalCreditsEarned() >= 100);
             checkAchievement("Good Citizen", gameState.getTotalCreditsEarned() >= 1000);
             checkAchievement("Model Citizen", gameState.getTotalCreditsEarned() >= 10000);
-            checkAchievement("Super Idol's Favorite", gameState.getTotalCreditsEarned() >= 100000);
-            checkAchievement("Super Idol's Best Friend", gameState.getTotalCreditsEarned() >= 1000000);
-            checkAchievement("Super Idol's Soulmate", gameState.getTotalCreditsEarned() >= 10000000);
-            checkAchievement("Super Idol's Other Half", gameState.getTotalCreditsEarned() >= 100000000);
-            checkAchievement("Super Idol's True Love", gameState.getTotalCreditsEarned() >= 1000000000);
+            checkAchievement("Super Idol Favorite", gameState.getTotalCreditsEarned() >= 100000);
+            checkAchievement("Super Idol Best Friend", gameState.getTotalCreditsEarned() >= 1000000);
+            checkAchievement("Super Idol Soulmate", gameState.getTotalCreditsEarned() >= 10000000);
+            checkAchievement("Super Idol Other Half", gameState.getTotalCreditsEarned() >= 100000000);
+            checkAchievement("Super Idol True Love", gameState.getTotalCreditsEarned() >= 1000000000);
             checkAchievement("Samba do Janeiro", gameState.getTotalCreditsEarned() >= 15000000000L);
             checkAchievement("John Xina", gameState.getTotalCreditsEarned() >= 100000000000L);
             checkAchievement("Supreme Idol", gameState.getTotalCreditsEarned() >= 1000000000000L);
@@ -965,7 +965,7 @@ public class GamePanel extends JPanel implements ActionListener {
             // Playtime achievements
             
         } catch (SQLException e) {
-            System.err.println("[GamePanel] Achievement error");
+            System.err.println("[GamePanel] Achievement error: " + e.getMessage());
         }
     }
     
@@ -973,11 +973,16 @@ public class GamePanel extends JPanel implements ActionListener {
         if (!condition) return;
         
         List<Map<String, Object>> achievements = dbManager.getGameAchievements();
+        boolean found = false;
+        
         for (Map<String, Object> a : achievements) {
-            if (a.get("name").equals(name)) {
+            String achName = (String) a.get("name");
+            if (achName.equals(name)) {
+                found = true;
                 int id = (int) a.get("id");
                 if (!unlockedAchievements.contains(id)) {
                     String result = dbManager.unlockAchievement(gameState.getUserId(), id);
+                    System.out.println("[Achievement] Unlocking: " + name + " (ID: " + id + ") - Result: " + result);
                     if (result.equals("SUCCESS")) {
                         unlockedAchievements.add(id);
                         SoundManager.getInstance().playCreditSound();
@@ -989,6 +994,10 @@ public class GamePanel extends JPanel implements ActionListener {
                 }
                 break;
             }
+        }
+        
+        if (!found) {
+            System.out.println("[Achievement] NOT FOUND in database: '" + name + "'");
         }
     }
 
@@ -1060,10 +1069,20 @@ public class GamePanel extends JPanel implements ActionListener {
                 gameState.loadFromStats(stats);
             }
             unlockedAchievements = dbManager.getUserAchievements(gameState.getUserId());
+            System.out.println("[GamePanel] Loaded " + unlockedAchievements.size() + " unlocked achievements");
+            
+            // DEBUG: Print all achievements from database
+            List<Map<String, Object>> allAchievements = dbManager.getGameAchievements();
+            System.out.println("[GamePanel] Total achievements in database: " + allAchievements.size());
+            for (Map<String, Object> ach : allAchievements) {
+                System.out.println("  - ID: " + ach.get("id") + " | Name: " + ach.get("name"));
+            }
+            
             int sessionId = dbManager.startGameSession(gameState.getUserId());
             gameState.setSessionId(sessionId);
         } catch (SQLException e) {
-            System.err.println("[GamePanel] Error loading data");
+            System.err.println("[GamePanel] Error loading data: " + e.getMessage());
+            e.printStackTrace();
         }
     }
     

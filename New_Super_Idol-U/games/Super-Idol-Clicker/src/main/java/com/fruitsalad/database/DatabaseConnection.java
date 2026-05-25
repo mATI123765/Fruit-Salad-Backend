@@ -45,7 +45,7 @@ public class DatabaseConnection {
     /**
      * Private constructor to prevent instantiation.
      */
-    private DatabaseConnection() { }
+    private DatabaseConnection() {}
     
     /* CONNECTION METHODS */
     /**

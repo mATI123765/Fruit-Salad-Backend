@@ -1,0 +1,102 @@
+package com.spaceinvaders.utils;
+
+public final class Constants {
+    /* WINDOW SETTINGS */
+    public static final int WINDOW_WIDTH = 800; // 800 px
+    public static final int WINDOW_HEIGHT = 600; // 600 px
+    public static final String GAME_TITLE = "Space Invaders"; // The game title
+
+    /* GAME SETTINGS */
+    public static final int FPS = 60; // Frame per second
+    public static final int GAME_SPEED = 1000 / FPS; // Game speed like ~16ms
+    public static final int INITIAL_LIVES = 3; // Player start with 3 lives
+
+    /* GRAPHICS SETTINGS */
+    public static final int STAR_COUNT_HIGH = 150;    // High quality
+    public static final int STAR_COUNT_MEDIUM = 75;   // Medium quality
+    public static final int STAR_COUNT_LOW = 30;      // Low quality (better performance)
+
+    /* SETTINGS QUALITY LEVELS */
+    public static final int QUALITY_HIGH = 0;
+    public static final int QUALITY_MEDIUM = 1;
+    public static final int QUALITY_LOW = 2;
+
+    /* SETTINGS FPS */
+    public static final int FPS_60 = 60;
+    public static final int FPS_120 = 120;
+    public static final int FPS_UNLIMITED = 0; // 0 means no delay between frames
+
+    public static final int FPS_OPTION_60 = 0;
+    public static final int FPS_OPTION_120 = 1;
+    public static final int FPS_OPTION_UNLIMITED = 2;
+
+    /* BASE SPEED (pixels per second at 60 FPS) */
+    // These are the "reference" speeds - actual movement uses delta time
+    public static final double BASE_FPS = 60.0;
+
+    // Player: 5 pixels/frame at 60fps = 300 pixels/second
+    public static final double PLAYER_SPEED_PER_SEC = 300.0;
+
+    // Player bullet: 8 pixels/frame at 60fps = 480 pixels/second
+    public static final double PLAYER_BULLET_SPEED_PER_SEC = 480.0;
+
+    // Alien bullet: 5 pixels/frame at 60fps = 300 pixels/second
+    public static final double ALIEN_BULLET_SPEED_PER_SEC = 300.0;
+
+    // Alien base speed: 1 pixel/frame at 60fps = 60 pixels/second
+    public static final double ALIEN_SPEED_PER_SEC = 60.0;
+
+    // Alien drop distance (instant, not per second)
+    public static final double ALIEN_DROP_DISTANCE = 20.0;
+
+    // Mystery ship: 3 pixels/frame at 60fps = 180 pixels/second
+    public static final double MYSTERY_SHIP_SPEED_PER_SEC = 180.0;
+
+    // Star speed range (pixels per second)
+    public static final double STAR_MIN_SPEED_PER_SEC = 30.0;
+    public static final double STAR_MAX_SPEED_PER_SEC = 180.0;
+
+    /* MENU SETTINGS */
+    public static final int STAR_COUNT = 100; // Number of stars in background
+
+    /* PLAYER SETTINGS */
+    public static final int PLAYER_WIDTH = 50; // 50 px
+    public static final int PLAYER_HEIGHT = 30; // 30 px
+    public static final int PLAYER_Y_OFFSET = 50; // Distance from botton
+    public static final long PLAYER_SHOOT_COOLDOWN = 400; // 400 ms between shots
+
+    /* BULLET SETTINGS */
+    public static final int BULLET_WIDTH = 4; // 4px
+    public static final int BULLET_HEIGHT = 12; // 12px
+
+    /* ALIEN SETTINGS */
+    public static final int ALIEN_WIDTH = 40; // 40 px
+    public static final int ALIEN_HEIGHT = 30; // 30 px
+    public static final int ALIEN_COLUMNS = 11; // 11 aliens per row
+    public static final int ALIEN_ROWS = 5; // 5 rows of aliens
+    public static final int ALIEN_SPACING_X = 10; // Horizontal gap
+    public static final int ALIEN_SPACING_Y = 10; // Vertical gap
+    public static final int ALIEN_START_X = 50; // In left margin
+    public static final int ALIEN_START_Y = 80; // In top margin
+    public static final double ALIEN_SHOOT_CHANCE_BASE = 0.007; // Starting chance (0.7%)
+    public static final double ALIEN_SHOOT_CHANCE_INCREMENT = 0.002; // Increase per wave (0.2%)
+    public static final double ALIEN_SHOOT_CHANCE_MAX = 0.02; // Maximum chance (2%)
+
+    /* MYSTERY SHIP */
+    public static final int MYSTERY_SHIP_WIDTH = 60; // 60 px
+    public static final int MYSTERY_SHIP_HEIGHT = 25; // 25 px
+    public static final double MYSTERY_SHIP_SPAWN_CHANCE = 0.001; // 0.1% chance per frame
+
+    /* SHIELD SETTINGS */ 
+    public static final int SHIELD_COUNT = 4;           // Number of shields
+    public static final int SHIELD_Y_OFFSET = 120;      // Distance from bottom of screen
+
+    /* SCORING */
+    public static final int SCORE_ROW_1 = 10; // Botton rows = 10 score
+    public static final int SCORE_ROW_2 = 30; // Midle rows = 30 score
+    public static final int SCORE_ROW_3 = 50; // Top row = 50 score
+
+    private Constants() {
+        // Private constructor
+    }
+}

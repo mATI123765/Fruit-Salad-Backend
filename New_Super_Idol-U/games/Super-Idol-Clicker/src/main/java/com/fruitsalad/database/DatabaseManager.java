@@ -111,6 +111,7 @@ public class DatabaseManager {
         }
     }
     
+    /* GET ALL STATS */
     public Map<String, Double> getAllStats(int userId) throws SQLException {
         Map<String, Double> stats = new HashMap<>();
         String sql = "SELECT stat_name, stat_value FROM game_stats WHERE user_id = ? AND game_id = ?";
@@ -122,7 +123,7 @@ public class DatabaseManager {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 stats.put(rs.getString("stat_name"), rs.getDouble("stat_value"));
-            }
+            }   
         }
         return stats;
     }
@@ -221,12 +222,12 @@ public class DatabaseManager {
         Object[][] achievements = {
             // Clicks
             {GAME_ID, "First Click", "Click for the first time", 10, false},
-            {GAME_ID, "100 Clicks", "Your smile is sweeter than Super Idol's", 20, false},
+            {GAME_ID, "100 Clicks", "Your smile is sweeter than Super Idol", 20, false},
             {GAME_ID, "1.000 Clicks", "Dedicated clicker", 50, false},
             {GAME_ID, "5.000 Clicks", "The water is always cold with Super Idol", 80, false},
-            {GAME_ID, "15.000 Clicks", "You're a true Super Idol fan!", 140, false},
+            {GAME_ID, "15.000 Clicks", "You are a true Super Idol fan", 140, false},
             {GAME_ID, "40.000 Clicks", "Super Idol is watching you", 220, false},
-            {GAME_ID, "105.000ºC Clicks", "Your love for Super Idol is over 105 degrees!", 315, true},
+            {GAME_ID, "105.000 Clicks", "Your love for Super Idol is over 105 degrees!", 315, true},
 
             // Social Credits
             {GAME_ID, "+15 Social Credit", "Earn 100 credits", 10, false},
@@ -238,7 +239,7 @@ public class DatabaseManager {
             {GAME_ID, "Super Idol's Other Half", "Earn 100.000.000 credits", 170, false},
             {GAME_ID, "Super Idol's True Love", "Earn 1 billion of credits", 200, false},
             {GAME_ID, "Samba do Janeiro", "Earn 15B of credits", 240, false},
-            {GAME_ID, "John Xina", "Earn 100B of credits", 290, false},
+            {GAME_ID, "John Xina", "Earn 100B of credits", 290, true},
             {GAME_ID, "Supreme Idol", "Earn 1T of credits", 333, true},
 
             // Upgrades
@@ -274,5 +275,6 @@ public class DatabaseManager {
                 stmt.executeUpdate();
             }
         }
+        System.out.println("[Database] All achievements configured.");
     }   
 }

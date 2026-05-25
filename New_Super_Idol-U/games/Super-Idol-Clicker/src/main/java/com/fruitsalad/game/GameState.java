@@ -97,7 +97,7 @@ public class GameState {
             "Golden Smile",
             "+25 credits per click",
             "/images/upgrades/4-upgrade.png",
-            2500, 1.15, 25, 0
+            2000, 1.15, 25, 0
         ));
         
         // Passive upgrades (increase credits per second)
@@ -117,30 +117,37 @@ public class GameState {
         
         UPGRADES.put("music_video", new UpgradeData(
             "Music Video",
-            "+20 credits per second",
+            "+30 credits per second",
             "/images/shop/2-item.png",
-            1500, 1.15, 0, 20
+            1500, 1.15, 0, 30
         ));
         
         UPGRADES.put("record_label", new UpgradeData(
             "Record Label",
             "+100 credits per second",
             "/images/shop/3-item.png",
-            8000, 1.15, 0, 100
+            6000, 1.15, 0, 100
         ));
         
         UPGRADES.put("world_tour", new UpgradeData(
             "World Tour",
             "+500 credits per second",
             "/images/shop/4-item.png",
-            50000, 1.15, 0, 500
+            30000, 1.15, 0, 500
         ));
 
         UPGRADES.put("rollito_primavera", new UpgradeData(
             "Rollito Primavera", 
-            "+800 creditss per second", 
+            "+800 credits per second", 
             "/images/shop/5-item.png", 
-            75000, 1.15, 0, 750
+            55000, 1.15, 0, 800
+        ));
+
+        UPGRADES.put("mondongo", new UpgradeData(
+            "Mondongo",
+            "Mondongo +2100 credits per second", 
+            "/images/shop/6-item.png", 
+            80000, 1.15, 0, 2100
         ));
     }
     
